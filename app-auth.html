@@ -1,0 +1,34 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<!--
+`app-auth`
+Simple polymer custom element for authentication module in your application
+
+@demo demo/index.html 
+-->
+
+<dom-module id="app-auth">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <h2>Hello [[prop1]]</h2>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'app-auth',
+
+      properties: {
+        prop1: {
+          type: String,
+          value: 'app-auth',
+        },
+      },
+
+    });
+  </script>
+</dom-module>
