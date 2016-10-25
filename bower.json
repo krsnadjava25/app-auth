@@ -1,0 +1,30 @@
+{
+  "name": "app-auth",
+  "description": "Simple polymer custom element for authentication module in your application",
+  "main": "app-auth.html",
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.4.0",
+    "iron-ajax": "PolymerElements/iron-ajax#^1.4.3"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^1.0.0",
+    "web-component-tester": "^4.0.0",
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/krsnadjava25/app-auth.git"
+  },
+  "keywords": [
+    "polymer",
+    "custom element",
+    "authentication"
+  ],
+  "authors": [
+    "Krisna Fathurahman <krisna.fathurahman@gmail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [],
+  "private": true
+}

@@ -1,0 +1,152 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-ajax/iron-ajax.html">
+
+<!--
+`app-auth`
+Simple polymer custom element for authentication module in your application
+
+@demo demo/index.html 
+
+### Event Throw
+`app-auth` will throw these custom events so host element can listen to them:
+
+Event Name | Description | Thrown Attribute(s)
+`init-error` | Error event because login and logout URL not set | -
+`login` | `app-auth` currently logging in given username | username:String
+`logout` | `app-auth` currently logging out given username | username:String
+-->
+
+<dom-module id="app-auth">
+  <template>
+    <style>
+    </style>
+    <iron-ajax
+      id="ajax"
+      method="[[method]]"
+      url="[[_url]]"
+      params="[[params]]"
+      body="[[body]]"
+      loading="[[working]]"
+      handle-as="json"
+      debounce-duration="300"
+      lastResponse={{_response}}
+      lastError={{_error}}
+    >
+    </iron-ajax>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'app-auth',
+
+      hostAttributes: {
+        hidden: true,
+      },
+
+      properties: {
+        username: {
+          type: String,
+        },
+        password: {
+          type: String,
+        },
+        method: {
+          type: String,
+          value: "POST",
+        },
+        _url: {
+          type: String,
+        },
+        _loginUrl: {
+          type: String,
+          value: null,
+        },
+        _logoutUrl: {
+          type: String,
+          value: null,
+        },
+        params: {
+          type: Array,
+        },
+        body: {
+          type: Array,
+        },
+        user: {
+          type: Object,
+          readOnly: true,
+          notify: true,
+        },
+        authorized: {
+          type: Boolean,
+          value: false,
+          readOnly: true,
+          notify: true,
+        },
+        working: {
+          type: Boolean,
+          value: false,
+          readOnly: true,
+          notify: true,
+        },
+        noLogout: {
+          type: Boolean,
+          value: true,
+        },
+        _response: {
+          type: Object,
+        },
+        _error: {
+          type: Object,
+        },
+      },
+
+      // Element Lifecycle
+      attached: function() {
+        this.listen(this.$.ajax, 'response', '_onAjaxResponse');
+        this.listen(this.$.ajax, 'error', '_onAjaxError');
+      },
+
+      // Private Methods
+      _onAjaxResponse: function(data) {
+        if(data.detail.__data__.status == 200) {
+          this._response = data.detail.__data__.response;
+          this.authorized = true;
+        } else {
+          this._error = data.detail.__data__.response;
+        }
+        console.log(this._response);
+      },
+
+      _onAjaxError: function(data) {
+        this._error = data.detail.error;
+        console.log(this._error);
+      },
+
+      // Public Methods
+      initUrl: function(urlLogin, urlLogout) {
+        // Dirty checking before set
+        if(urlLogin != null && urlLogin != "" && this._loginUrl != urlLogin) {
+          this._loginUrl = urlLogin;
+        }
+        if(urlLogout != null && urlLogout != "" && this._logoutUrl != urlLogout) {
+          this._logoutUrl = urlLogout;
+          this.noLogout = false;
+        }
+      },
+
+      login: function() {
+        this.fire('login', {username: this.username});
+        this._url = this._loginUrl;
+        this.$.ajax.generateRequest();
+      },
+
+      logout: function() {
+        this.fire('logout', {username: this.username});
+        this._url = this._logoutUrl;
+        this.$.ajax.generateRequest();
+      },
+
+    });
+  </script>
+</dom-module>
