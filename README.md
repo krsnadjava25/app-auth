@@ -1,6 +1,6 @@
 # \<app-auth\>
 
-[![Build Status](https://travis-ci.org/krsnadjava25/app-auth.svg?branch=development)](https://travis-ci.org/krsnadjava25/app-auth)
+[![Build Status](https://travis-ci.org/krsnadjava25/app-auth.svg)](https://travis-ci.org/krsnadjava25/app-auth)
 
 Simple polymer custom element for authentication module in your application
 
