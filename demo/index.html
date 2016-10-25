@@ -20,7 +20,14 @@
       <h3>Basic app-auth Demo</h3>
       <demo-snippet>
         <template>
-          <app-auth></app-auth>
+          <app-auth
+            id="auth"
+            method="GET"
+            params="['test':'yeah']"
+            username="polytest"
+            password="demo1234"
+          >
+          </app-auth>
         </template>
       </demo-snippet>
     </div>
