@@ -12,18 +12,76 @@
   </head>
   <body>
 
-    <test-fixture id="basic">
+    <test-fixture id="basic-auth">
       <template>
-        <app-auth></app-auth>
+        <app-auth
+            url="/api"
+            loginUrl="/login"
+            session="false"
+            method="POST"
+            username="polytest"
+            password="demo1234">
+        </app-auth>
       </template>
     </test-fixture>
 
     <script>
       suite('app-auth', function() {
 
-        test('instantiating the element works', function() {
-          var element = fixture('basic');
-          assert.equal(element.is, 'app-auth');
+        var request;
+        var server;
+        var responseHeaders = {
+          json: { 'Content-Type' : 'application/json' }
+        };
+
+        setup(function() {
+          server = sinon.fakeServer.create();
+          server.respondWith(
+            'POST',
+            /\/api\/login.*/, [
+              200,
+              responseHeaders.json,
+              '{"success":true,"username":"polytest","token":"abcdefghijklmnopqrstuvwxyz1234567890"}'
+            ]
+          );
+        });
+
+        teardown(function(){
+          server.restore();
+        });
+
+        suite('element behavior', function() {
+          
+          var element;
+
+          setup(function(){
+            element = fixture('basic-auth');
+          });
+
+          test('instantiating the element works', function() {
+            expect(element.is).to.be.equal('app-auth');
+          });
+
+        });
+
+        suite('when try to login successfully using basic-auth', function() {
+          
+          var element;
+
+          setup(function(){
+            element = fixture('basic-auth');
+          });
+
+          test('login success', function() {
+            request = element.login();
+            server.respond();
+            expect(request.response).to.be.ok;
+            expect(request.response).to.be.an('object');
+            expect(request.response.success).to.be.equal(true);
+            expect(request.response.username).to.be.equal("polytest");
+            expect(request.response.token).to.be.equal("abcdefghijklmnopqrstuvwxyz1234567890");
+          });
+
         });
 
       });
