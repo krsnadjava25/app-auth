@@ -23,9 +23,9 @@ Event Name | Description | Thrown Attribute(s)
     <iron-ajax
       id="ajax"
       method="[[method]]"
-      url="[[_url]]"
+      url="[[_ajaxUrl]]"
       params="[[params]]"
-      body="[[body]]"
+      body="[[_body]]"
       loading="[[working]]"
       handle-as="json"
       debounce-duration="300"
@@ -55,22 +55,21 @@ Event Name | Description | Thrown Attribute(s)
           type: String,
           value: "POST",
         },
-        _url: {
+        url: {
           type: String,
+          value: "",
         },
-        _loginUrl: {
+        loginUrl: {
+          type: String,
+          value: "",
+        },
+        logoutUrl: {
+          type: String,
+          value: "",
+        },
+        payload: {
           type: String,
           value: null,
-        },
-        _logoutUrl: {
-          type: String,
-          value: null,
-        },
-        params: {
-          type: Array,
-        },
-        body: {
-          type: Array,
         },
         user: {
           type: Object,
@@ -80,21 +79,30 @@ Event Name | Description | Thrown Attribute(s)
         authorized: {
           type: Boolean,
           value: false,
-          readOnly: true,
           notify: true,
         },
         working: {
           type: Boolean,
           value: false,
-          readOnly: true,
           notify: true,
         },
-        noLogout: {
+        params: {
+          type: Object,
+        },
+        session: {
           type: Boolean,
-          value: true,
+          value: false,
+        },
+        _ajaxUrl: {
+          type: String,
+          value: null,
+        },
+        _body: {
+          type: Object,
         },
         _response: {
           type: Object,
+          observer: '_onAjaxResponse'
         },
         _error: {
           type: Object,
@@ -108,42 +116,40 @@ Event Name | Description | Thrown Attribute(s)
       },
 
       // Private Methods
-      _onAjaxResponse: function(data) {
+      _onAjaxResponse: function() {
         if(data.detail.__data__.status == 200) {
           this._response = data.detail.__data__.response;
+          if(this.payload != null) {
+            this.user = this._response[this.payload];
+          } else {
+            this.user = this._response;
+          }
           this.authorized = true;
+          this.fire('success', {user: this.user});
         } else {
           this._error = data.detail.__data__.response;
+          this.fire('failed', {message: this._error});
         }
-        console.log(this._response);
       },
 
       _onAjaxError: function(data) {
         this._error = data.detail.error;
-        console.log(this._error);
-      },
-
-      // Public Methods
-      initUrl: function(urlLogin, urlLogout) {
-        // Dirty checking before set
-        if(urlLogin != null && urlLogin != "" && this._loginUrl != urlLogin) {
-          this._loginUrl = urlLogin;
-        }
-        if(urlLogout != null && urlLogout != "" && this._logoutUrl != urlLogout) {
-          this._logoutUrl = urlLogout;
-          this.noLogout = false;
-        }
+        this.fire('failed', {message: this._error});
       },
 
       login: function() {
         this.fire('login', {username: this.username});
-        this._url = this._loginUrl;
+        this._ajaxUrl = this.url + this.loginUrl;
+        this._body = {
+          username: this.username,
+          password: this.password
+        };
         this.$.ajax.generateRequest();
       },
 
       logout: function() {
         this.fire('logout', {username: this.username});
-        this._url = this._logoutUrl;
+        this._ajaxUrl = this.url + this.logoutUrl;
         this.$.ajax.generateRequest();
       },
 
