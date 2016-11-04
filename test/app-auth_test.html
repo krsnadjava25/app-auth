@@ -16,8 +16,9 @@
       <template>
         <app-auth
             url="/api"
-            loginUrl="/login"
+            login-url="/login"
             session="false"
+            payload="user"
             method="POST"
             username="polytest"
             password="demo1234">
@@ -28,7 +29,6 @@
     <script>
       suite('app-auth', function() {
 
-        var request;
         var server;
         var responseHeaders = {
           json: { 'Content-Type' : 'application/json' }
@@ -41,7 +41,7 @@
             /\/api\/login.*/, [
               200,
               responseHeaders.json,
-              '{"success":true,"username":"polytest","token":"abcdefghijklmnopqrstuvwxyz1234567890"}'
+              '{"success":true,"user":{"username":"polytest","token":"abcdefghijklmnopqrstuvwxyz1234567890"}}'
             ]
           );
         });
@@ -73,13 +73,14 @@
           });
 
           test('login success', function() {
-            request = element.login();
+            element.login();
             server.respond();
-            expect(request.response).to.be.ok;
-            expect(request.response).to.be.an('object');
-            expect(request.response.success).to.be.equal(true);
-            expect(request.response.username).to.be.equal("polytest");
-            expect(request.response.token).to.be.equal("abcdefghijklmnopqrstuvwxyz1234567890");
+            element.addEventListener('success', function(){
+              expect(element.authorized).to.be.equal(true);
+              expect(element.user).to.be.an('object');
+              expect(element.user.username).to.be.equal("polytest");
+              expect(element.user.token).to.be.equal("abcdefghijklmnopqrstuvwxyz1234567890");
+            });
           });
 
         });
